@@ -66,7 +66,7 @@ func TestTransfer(t *testing.T) {
 		message.NewSafeL2Message(connCallTx),
 	}
 
-	logs, _, snap, _ := runAssertion(t, makeSimpleInbox(messages), len(messages), 0)
+	logs, _, snap := runAssertion(t, makeSimpleInbox(messages), len(messages), 0)
 	results := processTxResults(t, logs)
 
 	allResultsSucceeded(t, results)
