@@ -82,6 +82,7 @@ func LaunchNode(
 	flags utils2.RPCFlags,
 	maxBatchTime time.Duration,
 	batcherMode BatcherMode,
+	dataSigner func([]byte) ([]byte, error),
 ) error {
 	l2ChainID := message.ChainAddressToID(rollupAddress)
 
@@ -130,7 +131,7 @@ func LaunchNode(
 		if err != nil {
 			return err
 		}
-		batch, err = batcher.NewSequencerBatcher(ctx, batcherMode.Core, batcherMode.InboxReader, client, batcherMode.DelayedMessagesTargetDelay, seqInbox, batcherMode.Auth)
+		batch, err = batcher.NewSequencerBatcher(ctx, batcherMode.Core, batcherMode.InboxReader, client, batcherMode.DelayedMessagesTargetDelay, seqInbox, batcherMode.Auth, dataSigner)
 		if err != nil {
 			return err
 		}

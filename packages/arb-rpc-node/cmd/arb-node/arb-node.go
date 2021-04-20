@@ -19,6 +19,7 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	golog "log"
 	"math/big"
 	"net/http"
@@ -173,12 +174,14 @@ func main() {
 	}
 	healthChan <- nodehealth.Log{Config: true, Var: "openethereumHealthcheckRPC", ValStr: rollupArgs.EthURL}
 
+	var dataSigner func([]byte) ([]byte, error)
 	var batcherMode rpc.BatcherMode
 	if *forwardTxURL != "" {
 		logger.Info().Str("forwardTxURL", *forwardTxURL).Msg("Arbitrum node starting in forwarder mode")
 		batcherMode = rpc.ForwarderBatcherMode{NodeURL: *forwardTxURL}
 	} else {
-		auth, err := cmdhelp.GetKeystore(rollupArgs.ValidatorFolder, walletArgs, fs, l1ChainId)
+		var auth *bind.TransactOpts
+		auth, dataSigner, err = cmdhelp.GetKeystore(rollupArgs.ValidatorFolder, walletArgs, fs, l1ChainId)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("Error running GetKeystore")
 		}
@@ -230,6 +233,7 @@ func main() {
 		rpcVars,
 		time.Duration(*maxBatchTime)*time.Second,
 		batcherMode,
+		dataSigner,
 	); err != nil {
 		logger.Fatal().Err(err).Msg("Error running LaunchNode")
 	}

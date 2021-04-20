@@ -39,35 +39,38 @@ func NewValidator(
 		return nil, err
 	}
 	rollup, err := ethbridge.NewRollup(wallet.RollupAddress().ToEthAddress(), client, builder)
+	_ = rollup
 	if err != nil {
 		return nil, err
 	}
 	panic("TODO: redo inbox reader")
-	bridgeAddress, err := rollup.DelayedBridge(context.Background())
-	if err != nil {
-		return nil, err
-	}
-	bridge, err := ethbridge.NewDelayedBridgeWatcher(bridgeAddress.ToEthAddress(), client)
-	if err != nil {
-		return nil, err
-	}
-	validatorUtils, err := ethbridge.NewValidatorUtils(
-		validatorUtilsAddress.ToEthAddress(),
-		wallet.RollupAddress().ToEthAddress(),
-		client,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &Validator{
-		rollup:         rollup,
-		bridge:         bridge,
-		validatorUtils: validatorUtils,
-		client:         client,
-		lookup:         lookup,
-		builder:        builder,
-		wallet:         wallet,
-	}, nil
+	/*
+		bridgeAddress, err := rollup.DelayedBridge(context.Background())
+		if err != nil {
+			return nil, err
+		}
+		bridge, err := ethbridge.NewDelayedBridgeWatcher(bridgeAddress.ToEthAddress(), client)
+		if err != nil {
+			return nil, err
+		}
+		validatorUtils, err := ethbridge.NewValidatorUtils(
+			validatorUtilsAddress.ToEthAddress(),
+			wallet.RollupAddress().ToEthAddress(),
+			client,
+		)
+		if err != nil {
+			return nil, err
+		}
+		return &Validator{
+			rollup:         rollup,
+			bridge:         bridge,
+			validatorUtils: validatorUtils,
+			client:         client,
+			lookup:         lookup,
+			builder:        builder,
+			wallet:         wallet,
+		}, nil
+	*/
 }
 
 func (v *Validator) removeOldStakers(ctx context.Context) (*types.Transaction, error) {

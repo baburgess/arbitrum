@@ -113,18 +113,20 @@ func (r *Rollup) StakeOnNewNode(
 	prevProposedBlock *big.Int,
 	prevInboxMaxCount *big.Int,
 ) error {
-	seqBatchProof := []byte{}
 	return errors.New("TODO: implement sequencer batch proof")
-	_, err := r.builderCon.StakeOnNewNode(
-		authWithContext(ctx, r.builderAuth),
-		nodeHash,
-		assertion.BytesFields(),
-		assertion.IntFields(),
-		prevProposedBlock,
-		prevInboxMaxCount,
-		seqBatchProof,
-	)
-	return errors.WithStack(err)
+	/*
+		seqBatchProof := []byte{}
+		_, err := r.builderCon.StakeOnNewNode(
+			authWithContext(ctx, r.builderAuth),
+			nodeHash,
+			assertion.BytesFields(),
+			assertion.IntFields(),
+			prevProposedBlock,
+			prevInboxMaxCount,
+			seqBatchProof,
+		)
+		return errors.WithStack(err)
+	*/
 }
 
 func (r *Rollup) ReturnOldDeposit(ctx context.Context, staker common.Address) error {
