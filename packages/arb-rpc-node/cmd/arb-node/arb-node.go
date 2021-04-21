@@ -20,6 +20,7 @@ import (
 	"context"
 	"flag"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/offchainlabs/arbitrum/packages/arb-util/broadcastclient"
 	golog "log"
 	"math/big"
 	"net/http"
@@ -77,6 +78,12 @@ func main() {
 		}
 	}()
 
+	broadcastClient := broadcastclient.NewBroadcastClient("ws://127.0.0.1:9742/", nil)
+	sequencerFeed, err := broadcastClient.Connect()
+	if err != nil {
+		log.Fatal().Err(err).Msg("unable to start broadcastclient")
+	}
+
 	ctx := context.Background()
 	fs := flag.NewFlagSet("", flag.ContinueOnError)
 	walletArgs := cmdhelp.AddWalletFlags(fs)
@@ -99,7 +106,7 @@ func main() {
 
 	//go http.ListenAndServe("localhost:6060", nil)
 
-	err := fs.Parse(os.Args[1:])
+	err = fs.Parse(os.Args[1:])
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Error parsing arguments")
 	}
@@ -156,7 +163,7 @@ func main() {
 	for {
 		ethClient, err := ethutils.NewRPCEthClient(rollupArgs.EthURL)
 		if err == nil {
-			inboxReader, err = mon.StartInboxReader(context.Background(), ethClient, rollupArgs.Address, healthChan)
+			inboxReader, err = mon.StartInboxReader(context.Background(), ethClient, rollupArgs.Address, healthChan, sequencerFeed)
 			if err == nil {
 				break
 			}

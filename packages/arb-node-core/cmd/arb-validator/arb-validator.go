@@ -44,6 +44,7 @@ import (
 	"github.com/offchainlabs/arbitrum/packages/arb-node-core/monitor"
 	"github.com/offchainlabs/arbitrum/packages/arb-node-core/nodehealth"
 	"github.com/offchainlabs/arbitrum/packages/arb-node-core/staker"
+	"github.com/offchainlabs/arbitrum/packages/arb-util/broadcastclient"
 	"github.com/offchainlabs/arbitrum/packages/arb-util/common"
 )
 
@@ -80,6 +81,12 @@ func main() {
 			log.Error().Err(err).Msg("healthcheck server failed")
 		}
 	}()
+
+	broadcastClient := broadcastclient.NewBroadcastClient("ws://127.0.0.1:9742/", nil)
+	sequencerFeed, err := broadcastClient.Connect()
+	if err != nil {
+		log.Fatal().Err(err).Msg("unable to start broadcastclient")
+	}
 
 	if len(os.Args) < 2 {
 		usageStr := "Usage: arb-validator [folder] [RPC URL] [rollup address] [validator utils address] [strategy] " + cmdhelp.WalletArgsString
@@ -233,7 +240,7 @@ func main() {
 		logger.Fatal().Str("chain", hex.EncodeToString(chainMachineHash[:])).Str("arbCore", hex.EncodeToString(initialMachineHash[:])).Msg("Initial machine hash loaded from arbos.mexe doesn't match chain's initial machine hash")
 	}
 
-	reader, err := mon.StartInboxReader(ctx, client, common.NewAddressFromEth(rollupAddr), healthChan)
+	reader, err := mon.StartInboxReader(ctx, client, common.NewAddressFromEth(rollupAddr), healthChan, sequencerFeed)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to create inbox reader")
 	}
